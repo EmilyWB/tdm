@@ -1,0 +1,77 @@
+
+
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "https://example.com/tdm-schedule.schema.json",
+    "title": "TDM Schedule Definition",
+    "description": "Schema for Time Division Multiplexing schedule configuration",
+    "type": "object",
+    "required": ["name", "time_unit", "tick_period", "cycle_period", "tasks"],
+    "properties": {
+        "name": {
+            "description": "Name of the schedule",
+            "type": "string"
+        },
+        "description": {
+            "description": "Arbitrary string field description",
+            "type": "string"
+        },
+        "time_unit": {
+            "description": "Time unit for all period and time measurements",
+            "type": "string",
+            "enum": ["microsecond", "millisecond", "seconds"]
+        },
+        "tick_period": {
+            "description": "Fundamental time period of the schedule, in seconds",
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMinimum": true
+        },
+        "cycle_period": {
+            "description": "Total cycle time of the schedule, in seconds",
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMinimum": true
+        },
+        "sub_cycle_period": {
+            "description": "Optional sub-period within the main cycle in seconds, useful for 2D matrix visualization",
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMinimum": true
+        },
+        "tasks": {
+            "description": "List of tasks in the schedule",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": ["task_name", "task_assigned_time", "task_execution_frequency", "task_execution_start_time"],
+                "properties": {
+                    "task_name": {
+                        "description": "Name of task",
+                        "type": "string"
+                    },
+                    "task_assigned_time": {
+                        "description": "Time assigned for this task. Must be multiples of the tick period",
+                        "type": "number",
+                        "minimum": 0,
+                        "exclusiveMinimum": true
+                    },
+                    "task_execution_frequency": {
+                        "description": "Execution frequency of the task in Hz",
+                        "type": "number",
+                        "minimum": 0,
+                        "exclusiveMinimum": true
+                    },
+                    "task_execution_start_time": {
+                        "description": "Start time offset for task execution",
+                        "type": "number",
+                        "minimum": 0
+                    }
+                },
+                "additionalProperties": false
+            }
+        }
+    },
+    "additionalProperties": false
+}

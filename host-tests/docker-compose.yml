@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  cpputest:
+    build:
+      context: ..
+      dockerfile: host-tests/Dockerfile
+    container_name: tdm_scheduler_tests
+    volumes:
+      - ..:/workspace
+    working_dir: /workspace/host-tests
+    command: bash
+    stdin_open: true
+    tty: true
+    
+  test-runner:
+    build:
+      context: ..
+      dockerfile: host-tests/Dockerfile
+    container_name: tdm_scheduler_test_runner
+    volumes:
+      - ..:/workspace
+    working_dir: /workspace/host-tests
+    command: >
+      bash -c "
+        mkdir -p build &&
+        cd build &&
+        cmake .. &&
+        make &&
+        ./tdm_tests -v
+      "

@@ -1,107 +1,169 @@
-!<AUTO_GENERATION_HEADER>!
-#include <stdint.h>
-#include "tdm.hpp"
+!<AUTO_GENERATION_HEADER> !
+#include <cstdint>
+#include "tdm_stub.hpp"
 
-/***************************** GLOBAL VARIABLES *****************************/
+namespace !<TDM_NAMESPACE>! {
 
-const scheduleType_e kScheduleType = !<SCHEDULE_TYPE>!
+/***************************** STATIC CONSTANTS *****************************/
 
-tdmTaskId_e g_currentRunningTask = tdmTaskId_Idle
-tdmTaskId_e g_taskToExecute = tdmTaskId_Idle
-tdmTaskId_e g_lastAllocatedTask = tdmTaskId_Idle;
-!<QUANTA_UNIT>! g_currentTimeQuanta = 0;
-!<QUANTA_UNIT>! g_overrunTimeQuanta = 0;
+const scheduleType_e BaseTdmScheduler::ms_scheduleType = !<SCHEDULE_TYPE> !;
+const !<QUANTA_UNIT> !BaseTdmScheduler::kCycleSize = !<CYCLE_SIZE> !;
+
+/***************************** CONSTRUCTOR/DESTRUCTOR *****************************/
+
+BaseTdmScheduler::BaseTdmScheduler()
+    : currentExecutingTask_(tdmTaskId_Idle), 
+    taskToExecute_(tdmTaskId_Idle), 
+    lastAllocatedTask_(tdmTaskId_Idle), 
+    currentTimeQuanta_(0), 
+    overrunTimeQuanta_(0)
+{
+}
+
+BaseTdmScheduler::~BaseTdmScheduler()
+{
+}
+
+/***************************** PUBLIC METHODS *****************************/
 
 
-/***************************** FUNCTIONS *****************************/
-
-bool tdmScheduleCall() {
+bool BaseTdmScheduler::scheduleCall()
+{
     // Boolean to indicate whether the execution thread should be triggered
     // to execute a task
     bool triggerNewTask = false;
 
     // Get the task that is allocated for this time quanta
-    tdmTaskId_e allocatedTask = getTaskAtTimeQuanta(g_currentTimeQuanta);
+    tdmTaskId_e allocatedTask = getTaskAtTimeQuanta(currentTimeQuanta_);
 
     // Check if a task is running that shouldnt be at this time quanta,
     // excluding idle
-    if ((taskAtCurrentQuanta != getCurrentExecutingTask()) &&
-        (g_currentRunningTask != tdmTaskId_Idle)) {
+    if ((allocatedTask != getCurrentExecutingTask()) &&
+        (getCurrentExecutingTask() != tdmTaskId_Idle))  {
         // ERROR HERE!!!
-        // Dont increment the time quanta, wait another tick until the running task is done 
-        g_overrungTimeQuanta++;
+        // Dont increment the time quanta, wait another tick until the running task is done
+        overrunTimeQuanta_++;
         raiseTdmSchedulingError();
-    } else {
+    }
+    else {
         // No unexpected task execution, normal operation
 
         // Detect edge change, trigger task execution if edge is the start of a new
         // contiguous task allocation
-        if ((g_lastAllocatedTask != allocatedTask) &&
-            (currentAllocatedTask != tdmTaskId_Idle)) {
+        if ((lastAllocatedTask_ != allocatedTask) &&
+            (allocatedTask != tdmTaskId_Idle))
+        {
 
-            setGlobalTaskToExecute(allocatedTask);
+            setTaskToExecute(allocatedTask);
             triggerNewTask = true;
         }
 
         // Increment time quanta, wrap around max value
-        g_currentTimeQuanta++;
-        if (g_currentTimeQuanta >= kCycleSize) {
-            g_currentTimeQuanta = 0;
+        currentTimeQuanta_++;
+        if (currentTimeQuanta_ >= kCycleSize)
+        {
+            currentTimeQuanta_ = 0;
         }
 
         // Cache task allocation to detect edge change at next call
-        g_lastAllocatedTask = allocatedTask;
+        lastAllocatedTask_ = allocatedTask;
     }
     return triggerNewTask;
 }
 
-void tdmExecuteCall() {
+void BaseTdmScheduler::executeCall()
+{
     tdmTaskId_e taskToExecute = getTaskToExecute();
-    switch (taskToExecute) {
-!<EXECUTION_CALLS>!
-        default: {
+    switch (taskToExecute)
+    {
+!<EXECUTION_CALLS>!    
+    default:
+        {
             // Do nothing, invalid ID
         }
     }
 }
 
-
-tdmTaskId_e getTaskAtTimeQuanta(!<QUANTA_UNIT>! timeQuanta) {
+tdmTaskId_e BaseTdmScheduler::getTaskAtTimeQuanta(!<QUANTA_UNIT> !timeQuanta)
+{
     tdmTaskId_e task;
 
-    switch(kScheduleType) {
-        case(tdmScheduleType_table): {
-            task = getTaskAtTimeQuantaFromTable(timeQuanta);
-            break;
-        }
-        case(tdmScheduleType_json): {
-            task = getTaskAtTimeQuantaFromJson(timeQuanta);
-            break;
-        }
-        case(tdmScheduleType_custom): {
-            task = getTaskAtTimeQuantaFromCustom(timeQuanta);
-            break;
-        }
-        default: {
-            // Error
-            task = tdmTaskId_Idle;
-            break;
-        }
+    switch (ms_scheduleType)
+    {
+    case tdmScheduleType_table:
+    {
+        task = getTaskAtTimeQuantaFromTable(timeQuanta);
+        break;
+    }
+    case tdmScheduleType_json:
+    {
+        task = getTaskAtTimeQuantaFromJson(timeQuanta);
+        break;
+    }
+    case tdmScheduleType_custom:
+    {
+        task = getTaskAtTimeQuantaFromCustom(timeQuanta);
+        break;
+    }
+    default:
+    {
+        // Error
+        task = tdmTaskId_Idle;
+        break;
+    }
     }
     return task;
 }
 
-tdmTaskId_e getTaskAtTimeQuantaFromTable(!<QUANTA_UNIT>! timeQuanta) {
+tdmTaskId_e BaseTdmScheduler::getTaskAtTimeQuantaFromTable(!<QUANTA_UNIT> !timeQuanta)
+{
     return kScheduleTable[timeQuanta];
 }
 
-tdmTaskId_e getTaskAtTimeQuantaFromJson(!<QUANTA_UNIT>! timeQuanta) {
-!<GET_TASK_QUANTA_FROM_JSON>!
+tdmTaskId_e BaseTdmScheduler::getTaskAtTimeQuantaFromJson(!<QUANTA_UNIT> !timeQuanta)
+{
+    !<GET_TASK_QUANTA_FROM_JSON> !
+}
+
+void BaseTdmScheduler::setCurrentExecutingTask(tdmTaskId_e taskId)
+{
+    currentExecutingTask_ = taskId;
+}
+
+void BaseTdmScheduler::setTaskToExecute(tdmTaskId_e taskId)
+{
+    taskToExecute_ = taskId;
+}
+
+tdmTaskId_e BaseTdmScheduler::getCurrentExecutingTask() const
+{
+    return currentExecutingTask_;
+}
+
+tdmTaskId_e BaseTdmScheduler::getTaskToExecute() const
+{
+    return taskToExecute_;
+}
+
+void BaseTdmScheduler::raiseTdmSchedulingError()
+{
+    // Default implementation - can be overridden by derived classes
+    // or users can provide their own implementation
+}
+
+tdmTaskId_e BaseTdmScheduler::getTaskAtTimeQuantaFromCustom(!<QUANTA_UNIT> !timeQuanta)
+{
+    // Default implementation returns idle - should be overridden in derived classes
+    return tdmTaskId_Idle;
 }
 
 /***************************** AUTOGENERATED TASK DATA *****************************/
-!<TASK_DATA_DEFINTIONS>!
-
-const tdmTaskId_e kScheduleTable[kCycleSize] = {
+const tdmTaskId_e BaseTdmScheduler::kScheduleTable[BaseTdmScheduler::kCycleSize] = {
 !<SCHEDULING_TABLE>!
 };
+
+ const tdmTaskData_t BaseTdmScheduler::kTaskData[BaseTdmScheduler::kNumberOfTasks] = {
+!<TASK_DATA>!
+};
+
+} // namespace !<TDM_NAMESPACE>!
