@@ -4,4 +4,4 @@
 
 namespace !<TDM_NAMESPACE>! {
 
-} // namespace !<NAME_SPACE>!
+} // namespace !<TDM_NAMESPACE>!

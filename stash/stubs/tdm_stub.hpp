@@ -33,29 +33,30 @@ typedef enum scheduleType_ {
 class BaseTdmScheduler {
 public:
     // Constructor
-    TdmScheduler();
+    BaseTdmScheduler();
     
     // Destructor
-    ~TdmScheduler();
+    virtual ~BaseTdmScheduler();
 
     // Public methods
     bool scheduleCall();
     void executeCall();
 
+protected:
+    // Getters and setters - default implementations provided, override for thread-safety
+    virtual void setCurrentExecutingTask(tdmTaskId_e taskId);
+    virtual void setTaskToExecute(tdmTaskId_e taskId);
+    virtual tdmTaskId_e getCurrentExecutingTask() const;
+    virtual tdmTaskId_e getTaskToExecute() const;
+
+    // User-overridable hooks
+    virtual tdmTaskId_e getTaskAtTimeQuantaFromCustom(!<QUANTA_UNIT>! timeQuanta);
+    virtual void raiseTdmSchedulingError();
 
 private:
     tdmTaskId_e getTaskAtTimeQuanta(!<QUANTA_UNIT>! timeQuanta);
     tdmTaskId_e getTaskAtTimeQuantaFromTable(!<QUANTA_UNIT>! timeQuanta);
     tdmTaskId_e getTaskAtTimeQuantaFromJson(!<QUANTA_UNIT>! timeQuanta);
-    
-    // Getters and setters for thread-safe access
-    virtual void setCurrentExecutingTask(tdmTaskId_e taskId) = 0;
-    virtual void setTaskToExecute(tdmTaskId_e taskId) = 0;
-    virtual tdmTaskId_e getCurrentExecutingTask() const = 0;
-    virtual tdmTaskId_e getTaskToExecute() const = 0;
-    virtual tdmTaskId_e getTaskAtTimeQuantaFromCustom(!<QUANTA_UNIT>! timeQuanta) = 0;
-    virtual void raiseTdmSchedulingError() = 0;
-
 
     tdmTaskId_e currentExecutingTask_;
     tdmTaskId_e taskToExecute_;
@@ -67,7 +68,7 @@ private:
     static const scheduleType_e kScheduleType;
     static const !<QUANTA_UNIT>! kCycleSize;
     static const !<QUANTA_UNIT>! kNumberOfTasks;
-    static const tdmTaskId_e kScheduleTable[];
+    static const tdmTaskId_e kScheduleTable[kCycleSize];
     static const tdmTaskData_t kTaskData[kNumberOfTasks];
 };
 

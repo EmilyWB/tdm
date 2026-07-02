@@ -1,4 +1,5 @@
-!<AUTO_GENERATION_HEADER> !
+!<AUTO_GENERATION_HEADER>!
+
 #include <cstdint>
 #include "tdm_stub.hpp"
 
@@ -6,8 +7,8 @@ namespace !<TDM_NAMESPACE>! {
 
 /***************************** STATIC CONSTANTS *****************************/
 
-const scheduleType_e BaseTdmScheduler::ms_scheduleType = !<SCHEDULE_TYPE> !;
-const !<QUANTA_UNIT> !BaseTdmScheduler::kCycleSize = !<CYCLE_SIZE> !;
+const scheduleType_e BaseTdmScheduler::kScheduleType = !<SCHEDULE_TYPE>!;
+const !<QUANTA_UNIT>! BaseTdmScheduler::kCycleSize = !<CYCLE_SIZE>!;
 
 /***************************** CONSTRUCTOR/DESTRUCTOR *****************************/
 
@@ -84,45 +85,41 @@ void BaseTdmScheduler::executeCall()
     }
 }
 
-tdmTaskId_e BaseTdmScheduler::getTaskAtTimeQuanta(!<QUANTA_UNIT> !timeQuanta)
+tdmTaskId_e BaseTdmScheduler::getTaskAtTimeQuanta(!<QUANTA_UNIT>! timeQuanta)
 {
     tdmTaskId_e task;
 
-    switch (ms_scheduleType)
+    switch (kScheduleType)
     {
-    case tdmScheduleType_table:
-    {
-        task = getTaskAtTimeQuantaFromTable(timeQuanta);
-        break;
-    }
-    case tdmScheduleType_json:
-    {
-        task = getTaskAtTimeQuantaFromJson(timeQuanta);
-        break;
-    }
-    case tdmScheduleType_custom:
-    {
-        task = getTaskAtTimeQuantaFromCustom(timeQuanta);
-        break;
-    }
-    default:
-    {
-        // Error
-        task = tdmTaskId_Idle;
-        break;
-    }
+        case (tdmScheduleType_table): {
+            task = getTaskAtTimeQuantaFromTable(timeQuanta);
+            break;
+        }
+        case (tdmScheduleType_json): {
+            task = getTaskAtTimeQuantaFromJson(timeQuanta);
+            break;
+        }
+        case (tdmScheduleType_custom): {
+            task = getTaskAtTimeQuantaFromCustom(timeQuanta);
+            break;
+        }
+        default: {
+            // Error
+            task = tdmTaskId_Idle;
+            break;
+        }
     }
     return task;
 }
 
-tdmTaskId_e BaseTdmScheduler::getTaskAtTimeQuantaFromTable(!<QUANTA_UNIT> !timeQuanta)
+tdmTaskId_e BaseTdmScheduler::getTaskAtTimeQuantaFromTable(!<QUANTA_UNIT>! timeQuanta)
 {
     return kScheduleTable[timeQuanta];
 }
 
-tdmTaskId_e BaseTdmScheduler::getTaskAtTimeQuantaFromJson(!<QUANTA_UNIT> !timeQuanta)
+tdmTaskId_e BaseTdmScheduler::getTaskAtTimeQuantaFromJson(!<QUANTA_UNIT>! timeQuanta)
 {
-    !<GET_TASK_QUANTA_FROM_JSON> !
+    !<GET_TASK_QUANTA_FROM_JSON>!
 }
 
 void BaseTdmScheduler::setCurrentExecutingTask(tdmTaskId_e taskId)
@@ -151,7 +148,7 @@ void BaseTdmScheduler::raiseTdmSchedulingError()
     // or users can provide their own implementation
 }
 
-tdmTaskId_e BaseTdmScheduler::getTaskAtTimeQuantaFromCustom(!<QUANTA_UNIT> !timeQuanta)
+tdmTaskId_e BaseTdmScheduler::getTaskAtTimeQuantaFromCustom(!<QUANTA_UNIT>! timeQuanta)
 {
     // Default implementation returns idle - should be overridden in derived classes
     return tdmTaskId_Idle;
@@ -162,7 +159,7 @@ const tdmTaskId_e BaseTdmScheduler::kScheduleTable[BaseTdmScheduler::kCycleSize]
 !<SCHEDULING_TABLE>!
 };
 
- const tdmTaskData_t BaseTdmScheduler::kTaskData[BaseTdmScheduler::kNumberOfTasks] = {
+const tdmTaskData_t BaseTdmScheduler::kTaskData[BaseTdmScheduler::kNumberOfTasks] = {
 !<TASK_DATA>!
 };
 
