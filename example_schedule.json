@@ -1,0 +1,28 @@
+{
+    "name": "Example TDM Schedule",
+    "description": "Sample schedule with two tasks demonstrating TDM configuration",
+    "time_unit": "milliseconds",
+    "tick_period": 1,
+    "cycle_period": 1000,
+    "sub_cycle_period": 10,
+    "tasks": [
+        {
+            "task_name": "Task_100Hz",
+            "task_assigned_time": 8,
+            "task_execution_frequency": 100,
+            "task_execution_start_time": 0
+        },
+        {
+            "task_name": "Task_10Hz",
+            "task_assigned_time": 1,
+            "task_execution_frequency": 10,
+            "task_execution_start_time": 8
+        },
+        {
+            "task_name": "Task_1Hz",
+            "task_assigned_time": 1,
+            "task_execution_frequency": 1,
+            "task_execution_start_time": 9
+        }
+    ]
+}

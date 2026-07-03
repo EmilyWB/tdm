@@ -12,6 +12,16 @@ dist
 dist-ssr
 *.local
 
+# C/C++ build (CMake)
+build/
+*.o
+*.obj
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
